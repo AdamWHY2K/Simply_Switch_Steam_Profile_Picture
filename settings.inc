@@ -16,6 +16,9 @@ SSS_PFP SETTINGS:
 //Double click the second column for "sessionid" and copy the value
 //Replace "sdbjh1871bhdw81db81" in this file with the value you just copied
 //
+//If you don't care what order the profile pictures are displayed in set Randomized to "True"
+//If you are using this to "animate" your profile picture, leave Randomized as "False"
+//
 //If you have any issues please first check the .log, then ensure the values in this file are correct, then open an issue on github.
 //
 //Profile pictures must be .jpg, .jpeg, or .png and under 1mb
@@ -23,3 +26,4 @@ SSS_PFP SETTINGS:
 Steam64ID=2319051092741978
 SessionID=sdbjh1871bhdw81db81
 Cookie=1298541294KJSFASFASF%D5%DSKA110455601DDAAD114
+Randomized=False
