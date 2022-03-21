@@ -12,6 +12,8 @@ A program that iterates through pictures in a folder, changing your Steam profil
 
 Can be used for animation, albeit rather slow animation. Steam limits profile picture changes to one every 30 - 40 seconds.
 
+https://user-images.githubusercontent.com/68286215/159337314-fafd919e-8daa-46e5-a7a7-55ef934d0d88.mp4
+
 
 # Requirements
 * Steam
@@ -25,10 +27,11 @@ Can be used for animation, albeit rather slow animation. Steam limits profile pi
 * Find your Steam64ID [here](https://www.steamidfinder.com/) and enter it into `settings.inc`.
 * Ensure you are logged into steam on your browser.
 * Find your SessionID and Cookie by going to: [https://steamcommunity.com/actions/FileUploader?type=player_avatar_image&sId=**YOURSTEAM64IDHERE**](https://steamcommunity.com/actions/FileUploader?type=player_avatar_image&sId=YOURSTEAM64IDHERE)
-* Press F12 or right click -> Inspect
-* Go to the "Application" tab
+* Press F12 or right click -> Inspect.
+* Go to the "Application" tab.
 * Double click the second column for `steamLoginSecure`, copy the value, and enter it into `settings.inc`.
 * Double click the second column for "sessionid", copy the value, and enter it into `settings.inc`.
-* Run `SSS_PFP.exe` or `SSS_PFP.pyw`
+* Run `SSS_PFP.exe` or `SSS_PFP.pyw`.
+* (Optional) Add a shortcut to `SSS_PFP.exe` in `C:\Users\USERNAME\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup` to start with Windows.
 
 # If you have any issues please first check `SSS_PFP.log`, then ensure the values in `settings.inc` are correct, then open an [issue](https://github.com/AdamWHY2K/Simply_Switch_Steam_Profile_Picture/issues/new).
