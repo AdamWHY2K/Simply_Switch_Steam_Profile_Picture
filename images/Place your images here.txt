@@ -1,0 +1,1 @@
+Profile pictures must be .jpg, .jpeg, or .png and under 1mb
