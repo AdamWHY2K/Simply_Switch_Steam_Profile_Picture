@@ -8,9 +8,9 @@ Author: AdamWHY2K
                                                   <img src="https://user-images.githubusercontent.com/68286215/130466563-1ad94060-fd62-4c87-ad3b-728858f8dcea.png">
 
 ## Description
-A program that iterates through pictures in a folder, changing your Steam profile picture every ~30 seconds
+A program that iterates through pictures in a folder, automatically changing your Steam profile picture every ~40 seconds
 
-Can be used for animation, albeit rather slow animation. Steam limits profile picture changes to one every 30 - 40 seconds.
+Can be used for animation, albeit rather slow animation. Steam limits profile picture changes to one every ~40 seconds.
 
 https://user-images.githubusercontent.com/68286215/159337314-fafd919e-8daa-46e5-a7a7-55ef934d0d88.mp4
 
