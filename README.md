@@ -8,7 +8,9 @@ Author: AdamWHY2K
                                                   <img src="https://user-images.githubusercontent.com/68286215/130466563-1ad94060-fd62-4c87-ad3b-728858f8dcea.png">
 
 ## Description
-A program that iterates through pictures in a folder, automatically changing your Steam profile picture every ~40 seconds. Iteration can be done randomly or linearly, random will choose any image in the folder as long as it isn't the current profile picture, whereas linear allows for—admittedly rather slow—animation.
+A program that iterates through pictures in a folder, automatically changing your Steam profile picture every ~40 seconds. 
+
+Iteration can be done randomly or linearly, random will choose any image in the folder as long as it isn't the current profile picture, whereas linear allows for—admittedly rather slow—animation.
 
 https://user-images.githubusercontent.com/68286215/159337314-fafd919e-8daa-46e5-a7a7-55ef934d0d88.mp4
 
