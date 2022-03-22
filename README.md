@@ -8,9 +8,7 @@ Author: AdamWHY2K
                                                   <img src="https://user-images.githubusercontent.com/68286215/130466563-1ad94060-fd62-4c87-ad3b-728858f8dcea.png">
 
 ## Description
-A program that iterates through pictures in a folder, automatically changing your Steam profile picture every ~40 seconds
-
-Can be used for animation, albeit rather slow animation. Steam limits profile picture changes to one every ~40 seconds.
+A program that iterates through pictures in a folder, automatically changing your Steam profile picture every ~40 seconds. Iteration can be done randomly or linearly, random will choose any image in the folder as long as it isn't the current profile picture, whereas linear allows for—admittedly rather slow—animation.
 
 https://user-images.githubusercontent.com/68286215/159337314-fafd919e-8daa-46e5-a7a7-55ef934d0d88.mp4
 
@@ -18,6 +16,7 @@ https://user-images.githubusercontent.com/68286215/159337314-fafd919e-8daa-46e5-
 # Requirements
 * Steam
 * Internet connection
+* The .pyw *should* run on either Windows or Linux, assuming you have python installed; I haven't tested it on anything but Windows though, so open an [issue](https://github.com/AdamWHY2K/Simply_Switch_Steam_Profile_Picture/issues/new) if it doesn't.
 
 # Installation
 * Download a [release](https://github.com/AdamWHY2K/Simply_Switch_Steam_Profile_Picture/releases).
@@ -32,6 +31,6 @@ https://user-images.githubusercontent.com/68286215/159337314-fafd919e-8daa-46e5-
 * Double click the second column for `steamLoginSecure`, copy the value, and enter it into `settings.inc`.
 * Double click the second column for "sessionid", copy the value, and enter it into `settings.inc`.
 * Run `SSS_PFP.exe` or `SSS_PFP.pyw`.
-* (Optional) Add a shortcut to `SSS_PFP.exe` in `C:\Users\USERNAME\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup` to start with Windows.
+* (Optional) Add a shortcut to `SSS_PFP.exe` or `SSS_PFP.pyw` in `C:\Users\USERNAME\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup` to start with Windows.
 
 # If you have any issues please first check `SSS_PFP.log`, then ensure the values in `settings.inc` are correct, then open an [issue](https://github.com/AdamWHY2K/Simply_Switch_Steam_Profile_Picture/issues/new).
