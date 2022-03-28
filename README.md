@@ -18,7 +18,7 @@ https://user-images.githubusercontent.com/68286215/159337314-fafd919e-8daa-46e5-
 # Requirements
 * Steam
 * Internet connection
-* The .pyw *should* run on either Windows or Linux, assuming you have python installed; I haven't tested it on anything but Windows though, so open an [issue](https://github.com/AdamWHY2K/Simply_Switch_Steam_Profile_Picture/issues/new) if it doesn't.
+* The .pyw *should* run on either Windows or Linux, assuming you have python and `requirements.txt` installed; I haven't tested it on anything but Windows though, so open an [issue](https://github.com/AdamWHY2K/Simply_Switch_Steam_Profile_Picture/issues/new) if it doesn't.
 
 # Installation
 * Download a [release](https://github.com/AdamWHY2K/Simply_Switch_Steam_Profile_Picture/releases).
