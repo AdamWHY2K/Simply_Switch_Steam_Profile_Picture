@@ -77,6 +77,7 @@ class App:
         if "#Error_BadOrMissingSteamID" in r.text:
             logging.error("\t\t\tIncorrect information in settings.inc")
             messagebox.showerror("SSS_PFP Error:", "Incorrect information in settings.inc!")
+            webbrowser.open_new_tab("settings.inc")
             raise SystemExit
 
     def read_settings(self) -> None:
