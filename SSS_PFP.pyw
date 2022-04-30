@@ -4,7 +4,7 @@ import os
 from os.path import exists
 from time import sleep
 import logging
-from tkinter import messagebox
+from pymsgbox import confirm, alert
 from random import choice
 import webbrowser
 import pystray
@@ -27,11 +27,12 @@ class App:
         self.randomized = False
         self.last_choice = ""
         SSS_PFP_github = requests.get("https://api.github.com/repos/AdamWHY2K/Simply_Switch_Steam_Profile_Picture/releases")
-        self.current_version = "1.0.4"
+        self.current_version = "1.0.5"
         self.latest_version = SSS_PFP_github.json()[0]["tag_name"][1:]
         self.changelog = SSS_PFP_github.json()[0]["body"]
         self.download_link = SSS_PFP_github.json()[0]["assets"][0]["browser_download_url"]
         self.is_running = True
+        self.count_expirations = 0
 
     def images_in_folder(self) -> bool:
         for i in os.listdir("images"):
@@ -41,8 +42,10 @@ class App:
     def check_for_update(self) -> None:
         logging.info("Checking for update")
         if self.current_version < self.latest_version:
-            if messagebox.askyesno("SSS_PFP - Update available",
-            f"\tCurrent version: {self.current_version}\n\t Latest version: {self.latest_version}\n\nChangelog:\n{self.changelog}\n\nDownload now?"):
+            if confirm(
+            f"\tCurrent version: {self.current_version}\n\t Latest version: {self.latest_version}\n\n{self.changelog}\n\nDownload now?",
+            "SSS_PFP - Update available",
+            buttons=["OK", "Cancel"]) == "OK":
                 webbrowser.open_new_tab(self.download_link) #Open download link in user's default browser
                 logging.debug("Downloading update")
                 raise SystemExit
@@ -56,16 +59,16 @@ class App:
         logging.info("Checking file space")
         if not exists("settings.inc"):
             logging.error("\t\t\tsettings.inc not found!\nExiting.")
-            messagebox.showerror("SSS_PFP Error:", "settings.inc not found!")
+            alert("settings.inc not found!", "SSS_PFP Error:", button="OK")
             raise SystemExit
         elif not exists("images\\"):
             os.mkdir("images")
             logging.error("\t\t\tNo files found in images folder!\nExiting.")
-            messagebox.showerror("SSS_PFP Error:", "No files found in images folder!")
+            alert("No files found in images folder!", "SSS_PFP Error:", button="OK")
             raise SystemExit
         elif not self.images_in_folder():
             logging.error("\t\t\tNo images found in images folder: .png, .jpg, and .jpeg allowed.\nExiting.")
-            messagebox.showerror("SSS_PFP Error:", "No images found in images folder: .png, .jpg, and .jpeg allowed.")
+            alert("No images found in images folder: .png, .jpg, and .jpeg allowed.", "SSS_PFP Error:", button="OK")
             raise SystemExit
 
         self.read_settings()
@@ -76,7 +79,7 @@ class App:
         #Ping the file uploader with user's creds to make sure they're valid
         if "#Error_BadOrMissingSteamID" in r.text:
             logging.error("\t\t\tIncorrect information in settings.inc")
-            messagebox.showerror("SSS_PFP Error:", "Incorrect information in settings.inc!")
+            alert("Incorrect information in settings.inc!", "SSS_PFP Error:", button="OK")
             webbrowser.open_new_tab("settings.inc")
             raise SystemExit
 
@@ -146,9 +149,20 @@ class App:
         elif "The server timed out while waiting for the browser's request." in request.text:
             logging.error("\t\t\tServer timeout")
         elif "#Error_BadOrMissingSteamID" in request.text:
-            logging.error("\t\t\tCookie expired")
-            messagebox.showerror("SSS_PFP Error:", "Cookie expired, update settings.inc")
-            raise SystemExit
+            if self.count_expirations > 3:
+                logging.error("\t\t\tCookie expired")
+                alert("Cookie expired, update settings.inc", "SSS_PFP Error:", button="OK")
+                webbrowser.open_new_tab("settings.inc")
+                self.is_running = False
+                ICON.stop()
+                raise SystemExit
+            else:
+                self.count_expirations += 1
+                logging.warning(f"Cookie expiration number: {self.count_expirations}")
+        else:
+            self.count_expirations = 0
+            # We only want to count cookie expired messages if they are consecutive
+            # Because if the change goes through any previous cookie expiration errors must have been a false positive
 
     def send_post(self, chosen_file) -> None:
         self.last_choice = chosen_file
@@ -175,12 +189,13 @@ class App:
         def quit():
             logging.info("Quitting from system tray")
             self.is_running = False
-            icon.stop()
+            ICON.stop()
         def open_various(value):
             logging.info(f"Opening {value} from system tray")
             webbrowser.open_new_tab(value)
         
-        icon = pystray.Icon(
+        global ICON
+        ICON = pystray.Icon(
         "SSS_PFP",
         icon=Image.open("icon.ico"),
         menu=pystray.Menu(
@@ -191,7 +206,7 @@ class App:
             pystray.MenuItem("Quit", lambda : quit())
             )
         )
-        icon.run_detached()
+        ICON.run_detached()
 
 if __name__ == "__main__":
     myApp = App()
