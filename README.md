@@ -12,7 +12,7 @@ A program that iterates through pictures in a folder, automatically changing you
 
 Iteration can be done randomly or linearly, random will choose any image in the folder as long as it isn't the current profile picture, whereas linear allows for—admittedly rather slow—animation.
 
-https://user-images.githubusercontent.com/68286215/159337314-fafd919e-8daa-46e5-a7a7-55ef934d0d88.mp4
+https://user-images.githubusercontent.com/68286215/160739726-1f9f3a6c-69f4-4f80-a499-9cad8677f0c9.mp4
 
 
 # Requirements
