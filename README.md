@@ -18,7 +18,8 @@ https://user-images.githubusercontent.com/68286215/160739726-1f9f3a6c-69f4-4f80-
 # Requirements
 * Steam
 * Internet connection
-* The .pyw *should* run on either Windows or Linux, assuming you have python and `requirements.txt` installed; I haven't tested it on anything but Windows though, so open an [issue](https://github.com/AdamWHY2K/Simply_Switch_Steam_Profile_Picture/issues/new) if it doesn't.
+* The .pyw *should*—mostly—run on either Windows or Linux, assuming you have python and `requirements.txt` installed; I haven't tested it on anything but Windows though, so open an [issue](https://github.com/AdamWHY2K/Simply_Switch_Steam_Profile_Picture/issues/new) if it doesn't.
+* I'd recommend just using the .exe if you're on Windows.
 
 # Installation
 * Download a [release](https://github.com/AdamWHY2K/Simply_Switch_Steam_Profile_Picture/releases).
@@ -27,12 +28,6 @@ https://user-images.githubusercontent.com/68286215/160739726-1f9f3a6c-69f4-4f80-
 * Open `settings.inc`.
 * Find your Steam64ID [here](https://www.steamidfinder.com/) and enter it into `settings.inc`.
 * Ensure you are logged into steam on your browser.
-* Find your SessionID and Cookie by going to: [https://steamcommunity.com/actions/FileUploader?type=player_avatar_image&sId=**YOURSTEAM64IDHERE**](https://steamcommunity.com/actions/FileUploader?type=player_avatar_image&sId=YOURSTEAM64IDHERE)
-* Press F12 or right click -> Inspect.
-* Go to the "Application" tab.
-* Double click the second column for `steamLoginSecure`, copy the value, and enter it into `settings.inc`.
-* Double click the second column for "sessionid", copy the value, and enter it into `settings.inc`.
 * Run `SSS_PFP.exe` or `SSS_PFP.pyw`.
-* (Optional) Add a shortcut to `SSS_PFP.exe` or `SSS_PFP.pyw` in `C:\Users\USERNAME\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup` to start with Windows.
 
-# If you have any issues please first check `SSS_PFP.log`, then ensure the values in `settings.inc` are correct, then open an [issue](https://github.com/AdamWHY2K/Simply_Switch_Steam_Profile_Picture/issues/new).
+# If you have any issues please first check `SSS_PFP.log`, then ensure the values in `settings.inc` are correct and that you are logged in to Steam via your browser, then open an [issue](https://github.com/AdamWHY2K/Simply_Switch_Steam_Profile_Picture/issues/new).

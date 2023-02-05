@@ -9,6 +9,8 @@ from random import choice
 import webbrowser
 import pystray
 from PIL import Image
+import browser_cookie3
+import platform
 
 class App:
 
@@ -21,14 +23,19 @@ class App:
             datefmt='%Y/%m/%d %I:%M:%S %p',
             filemode = 'w')
         logging.info("STARTING SSS_PFP")
+        self.cj = browser_cookie3.load()
         self.cookie = ""
         self.steam_64_id = ""
         self.session_id = ""
         self.randomized = False
         self.last_choice = ""
         SSS_PFP_github = requests.get("https://api.github.com/repos/AdamWHY2K/Simply_Switch_Steam_Profile_Picture/releases")
-        self.current_version = "1.0.5"
-        self.latest_version = SSS_PFP_github.json()[0]["tag_name"][1:]
+        self.current_version = "1.1.0"
+        try:
+            self.latest_version = SSS_PFP_github.json()[0]["tag_name"][1:]
+        except KeyError:
+            logging.warning("GitHub API limit exceeded, couldn't check for updates.")
+            self.latest_version = "0"
         self.changelog = SSS_PFP_github.json()[0]["body"]
         self.download_link = SSS_PFP_github.json()[0]["assets"][0]["browser_download_url"]
         self.is_running = True
@@ -78,12 +85,19 @@ class App:
             cookies={"steamLoginSecure": self.cookie, "sessionid": self.session_id})
         #Ping the file uploader with user's creds to make sure they're valid
         if "#Error_BadOrMissingSteamID" in r.text:
-            logging.error("\t\t\tIncorrect information in settings.inc")
-            alert("Incorrect information in settings.inc!", "SSS_PFP Error:", button="OK")
-            webbrowser.open_new_tab("settings.inc")
+            logging.error("\t\t\tLikely cookie expired, or incorrect information in settings.inc")
+            alert("Cookies not found! Ensure you are logged into steam via your browser", "SSS_PFP Error:", button="OK")
             raise SystemExit
 
     def read_settings(self) -> None:
+        logging.info("Getting cookies from cookiejar")
+        for i in self.cj:
+            if i.name == "steamLoginSecure":
+                self.cookie = i.value
+                logging.debug("Found cookie")
+            elif i.name == "sessionid":
+                self.session_id = i.value
+                logging.debug("Found SessionID")
         logging.info("Reading settings.inc")
         with open("settings.inc", "r") as f:
             logging.info("File opened successfully")
@@ -92,18 +106,11 @@ class App:
                 if current_line.startswith("//"):
                     pass
                     #Skip lines that are comments
-                elif current_line.startswith("Cookie"):
-                    self.cookie = re.split("Cookie=", current_line)[1].strip()
-                    #Split the string so that the actual data is seperated, strip any whitespace the user may have added
-                    logging.debug("Found cookie")
                 elif current_line.startswith("Steam64ID"):
                     self.steam_64_id = re.split("Steam64ID=", current_line)[1].strip()
                     logging.debug("Found Steam64ID")
-                elif current_line.startswith("SessionID"):
-                    self.session_id = re.split("SessionID=", current_line)[1].strip()
-                    logging.debug("Found SessionID")
                 elif current_line.startswith("Randomized"):
-                    if "True" in re.split("Randomized=", current_line)[1].strip():
+                    if "true" in re.split("Randomized=", current_line)[1].strip().lower():
                         self.randomized = True
     
     def initiate_post(self) -> None:
@@ -122,7 +129,7 @@ class App:
                     first_run = False
                     self.send_post(i)
                 else:
-                    logging.debug("Skipping non-image file: " + i)
+                    logging.debug("Skipping file: " + i)
             else:
                 logging.info("Linear")
                 for i in os.listdir("images"):
@@ -132,7 +139,8 @@ class App:
 
     def check_post(self, chosen_file, request) -> None:
         if "Failed to set avatar. Please try again." in request.text:
-            logging.warning("Failed to set avatar")
+            logging.warning("Failed to set avatar (likely DDoS protection)")
+            logging.info("Sleeping for 20 seconds")
             sleep(20)
             with open("images\\" + chosen_file, "rb") as retry_picture:
                 request = requests.post(
@@ -151,8 +159,7 @@ class App:
         elif "#Error_BadOrMissingSteamID" in request.text:
             if self.count_expirations > 3:
                 logging.error("\t\t\tCookie expired")
-                alert("Cookie expired, update settings.inc", "SSS_PFP Error:", button="OK")
-                webbrowser.open_new_tab("settings.inc")
+                alert("Cookie expired, log in to steam via your browser", "SSS_PFP Error:", button="OK")
                 self.is_running = False
                 ICON.stop()
                 raise SystemExit
@@ -193,6 +200,30 @@ class App:
         def open_various(value):
             logging.info(f"Opening {value} from system tray")
             webbrowser.open_new_tab(value)
+        def startup():
+            if platform.system() == "Windows":
+                def access_task_sched(command):
+                    with open("startup.bat", "w") as f:
+                        f.write("""
+icacls "%windir%\system32\config\system" >nul 2>&1
+if [%errorlevel%] neq [0] (
+    powershell -c "Start-Process \\"%0\\" -Verb runAs"
+    exit
+)
+""" + command)
+                    os.startfile("startup.bat")
+                if os.system("SchTasks /Query /TN SSS_PFP-Launcher") == False:
+                    # If SSS_PFP.exe is already set to run at start up
+                    access_task_sched("SchTasks /Delete /TN SSS_PFP-Launcher /F")
+                    alert("SSS_PFP.exe will not start with windows", "SSS_PFP Info:", button="OK")
+                    logging.info("Deleting startup task")
+                else:
+                    with open("launcher.bat", "w") as f: # Stupid fucking Microsoft doesn't let you specify a path to start a task in via command line
+                        f.write('chdir /D ' + os.getcwd() + '\nstart "" SSS_PFP.exe') # So we have to point to a batch file that changes path to install folder, then launches.
+                    path = os.getcwd() + "\\launcher.bat"
+                    access_task_sched("SchTasks /Create /SC ONLOGON /TN SSS_PFP-Launcher /TR " + path)
+                    alert("SSS_PFP.exe will start with windows", "SSS_PFP Info:", button="OK")
+                    logging.info("Creating startup task")
         
         global ICON
         ICON = pystray.Icon(
@@ -202,6 +233,7 @@ class App:
             pystray.MenuItem("Open images folder", lambda : open_various("images")),
             pystray.MenuItem("Open settings.inc", lambda : open_various("settings.inc")),
             pystray.MenuItem("Open log file", lambda : open_various("SSS_PFP.log")),
+            pystray.MenuItem("Toggle startup behaviour", lambda : startup()),
             pystray.MenuItem("Report a bug", lambda : open_various("https://github.com/AdamWHY2K/Simply_Switch_Steam_Profile_Picture/issues/new")),
             pystray.MenuItem("Quit", lambda : quit())
             )
