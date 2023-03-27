@@ -17,27 +17,29 @@ class App:
     def __init__(self) -> None:
         logging.basicConfig(
             filename='SSS_PFP.log',
-            encoding='utf-8',
             level=logging.DEBUG,
             format='%(asctime)s - %(levelname)s - %(message)s',
             datefmt='%Y/%m/%d %I:%M:%S %p',
             filemode = 'w')
         logging.info("STARTING SSS_PFP")
-        self.cj = browser_cookie3.load()
+        self.cj = browser_cookie3.load("steamcommunity.com")
         self.cookie = ""
         self.steam_64_id = ""
         self.session_id = ""
         self.randomized = False
         self.last_choice = ""
         SSS_PFP_github = requests.get("https://api.github.com/repos/AdamWHY2K/Simply_Switch_Steam_Profile_Picture/releases")
-        self.current_version = "1.1.0"
+        self.current_version = "1.1.1"
         try:
             self.latest_version = SSS_PFP_github.json()[0]["tag_name"][1:]
+            self.changelog = SSS_PFP_github.json()[0]["body"]
+            self.download_link = SSS_PFP_github.json()[0]["assets"][0]["browser_download_url"]
         except KeyError:
             logging.warning("GitHub API limit exceeded, couldn't check for updates.")
             self.latest_version = "0"
-        self.changelog = SSS_PFP_github.json()[0]["body"]
-        self.download_link = SSS_PFP_github.json()[0]["assets"][0]["browser_download_url"]
+            self.changelog = "Unable to find changelog"
+            self.download_link = "https://github.com/AdamWHY2K/Simply_Switch_Steam_Profile_Picture"
+        SSS_PFP_github.close()
         self.is_running = True
         self.count_expirations = 0
 
@@ -62,7 +64,6 @@ class App:
             logging.info("Latest version installed")
 
     def verify_various_valuables(self) -> None:
-        self.check_for_update()
         logging.info("Checking file space")
         if not exists("settings.inc"):
             logging.error("\t\t\tsettings.inc not found!\nExiting.")
@@ -78,18 +79,8 @@ class App:
             alert("No images found in images folder: .png, .jpg, and .jpeg allowed.", "SSS_PFP Error:", button="OK")
             raise SystemExit
 
-        self.read_settings()
-        r = requests.get(
-            "https://steamcommunity.com/actions/FileUploader", params={"type": "player_avatar_image","sId": self.steam_64_id},
-            data={"MAX_FILE_SIZE": "1048576", "type": "player_avatar_image", "sId": self.steam_64_id, "sessionid": self.session_id, "doSub": "1"},
-            cookies={"steamLoginSecure": self.cookie, "sessionid": self.session_id})
-        #Ping the file uploader with user's creds to make sure they're valid
-        if "#Error_BadOrMissingSteamID" in r.text:
-            logging.error("\t\t\tLikely cookie expired, or incorrect information in settings.inc")
-            alert("Cookies not found! Ensure you are logged into steam via your browser", "SSS_PFP Error:", button="OK")
-            raise SystemExit
-
     def read_settings(self) -> None:
+        self.cj = browser_cookie3.load("steamcommunity.com")
         logging.info("Getting cookies from cookiejar")
         for i in self.cj:
             if i.name == "steamLoginSecure":
@@ -117,6 +108,7 @@ class App:
         first_run = True
         while self.is_running:
             logging.debug("\t\t\tStart of main loop")
+            self.read_settings()
             if self.randomized:
                 logging.info("Randomized")
                 i = choice(os.listdir("images"))
@@ -139,6 +131,7 @@ class App:
 
     def check_post(self, chosen_file, request) -> None:
         if "Failed to set avatar. Please try again." in request.text:
+            request.close()
             logging.warning("Failed to set avatar (likely DDoS protection)")
             logging.info("Sleeping for 20 seconds")
             sleep(20)
@@ -152,21 +145,39 @@ class App:
                     logging.debug("Retry failed.")
                 else:
                     logging.debug("Retry successful")
+                request.close()
         elif "There was an error processing the image. Please ensure that it is no larger than 3072x3072 pixels" in request.text:
+            request.close()
             logging.error("\t\t\tFile " + chosen_file + " is too large")
         elif "The server timed out while waiting for the browser's request." in request.text:
+            request.close()
             logging.error("\t\t\tServer timeout")
+        elif "You've made too many requests recently." in request.text:
+            request.close()
+            logging.error("Too many requests")
+            logging.info("Sleeping for 40 seconds")
+            sleep(40)
         elif "#Error_BadOrMissingSteamID" in request.text:
+            request.close()
             if self.count_expirations > 3:
                 logging.error("\t\t\tCookie expired")
-                alert("Cookie expired, log in to steam via your browser", "SSS_PFP Error:", button="OK")
-                self.is_running = False
-                ICON.stop()
-                raise SystemExit
+                self.count_expirations = 0
+                if confirm("Open Steam in your browser, relog if necessary","SSS_PFP - Cookie expired",buttons=["OK", "Quit"]) == "OK":
+                    webbrowser.open_new_tab("https://steamcommunity.com")
+                    logging.debug("Opening steam")
+                    sleep(10)
+                    self.read_settings()
+                else:
+                    logging.info("Quitting due to expired cookie")
+                    self.is_running = False
+                    ICON.stop()
+                    raise SystemExit
             else:
+                request.close()
                 self.count_expirations += 1
                 logging.warning(f"Cookie expiration number: {self.count_expirations}")
         else:
+            request.close()
             self.count_expirations = 0
             # We only want to count cookie expired messages if they are consecutive
             # Because if the change goes through any previous cookie expiration errors must have been a false positive
@@ -224,6 +235,8 @@ if [%errorlevel%] neq [0] (
                     access_task_sched("SchTasks /Create /SC ONLOGON /TN SSS_PFP-Launcher /TR " + path)
                     alert("SSS_PFP.exe will start with windows", "SSS_PFP Info:", button="OK")
                     logging.info("Creating startup task")
+            else:
+                logging.error("Start-up currently only supported with windows, either open an issue on GitHub, or create a cron task")
         
         global ICON
         ICON = pystray.Icon(
@@ -242,6 +255,8 @@ if [%errorlevel%] neq [0] (
 
 if __name__ == "__main__":
     myApp = App()
+    myApp.check_for_update()
     myApp.verify_various_valuables()
+    myApp.read_settings()
     myApp.system_tray()
     myApp.initiate_post()
