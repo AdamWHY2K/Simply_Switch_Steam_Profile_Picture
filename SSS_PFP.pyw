@@ -29,7 +29,7 @@ class App:
         self.randomized = False
         self.last_choice = ""
         SSS_PFP_github = requests.get("https://api.github.com/repos/AdamWHY2K/Simply_Switch_Steam_Profile_Picture/releases")
-        self.current_version = "1.1.1"
+        self.current_version = "1.1.2"
         try:
             self.latest_version = SSS_PFP_github.json()[0]["tag_name"][1:]
             self.changelog = SSS_PFP_github.json()[0]["body"]
