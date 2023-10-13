@@ -9,7 +9,7 @@ from random import choice
 import webbrowser
 import pystray
 from PIL import Image
-import browser_cookie3
+import rookiepy
 import platform
 
 class App:
@@ -22,14 +22,14 @@ class App:
             datefmt='%Y/%m/%d %I:%M:%S %p',
             filemode = 'w')
         logging.info("STARTING SSS_PFP")
-        self.cj = browser_cookie3.load("steamcommunity.com")
+        self.cj = ""
         self.cookie = ""
         self.steam_64_id = ""
         self.session_id = ""
         self.randomized = False
         self.last_choice = ""
         SSS_PFP_github = requests.get("https://api.github.com/repos/AdamWHY2K/Simply_Switch_Steam_Profile_Picture/releases")
-        self.current_version = "1.1.2"
+        self.current_version = "1.1.3"
         try:
             self.latest_version = SSS_PFP_github.json()[0]["tag_name"][1:]
             self.changelog = SSS_PFP_github.json()[0]["body"]
@@ -79,16 +79,23 @@ class App:
             alert("No images found in images folder: .png, .jpg, and .jpeg allowed.", "SSS_PFP Error:", button="OK")
             raise SystemExit
 
-    def read_settings(self) -> None:
-        self.cj = browser_cookie3.load("steamcommunity.com")
+    def read_cookies(self) -> None:
         logging.info("Getting cookies from cookiejar")
-        for i in self.cj:
-            if i.name == "steamLoginSecure":
-                self.cookie = i.value
-                logging.debug("Found cookie")
-            elif i.name == "sessionid":
-                self.session_id = i.value
-                logging.debug("Found SessionID")
+        try:
+            self.cj = rookiepy.load(["steamcommunity.com"])
+            for i in self.cj:
+                if i["name"] == "steamLoginSecure":
+                    self.cookie = i['value']
+                    logging.debug("Found cookie")
+                elif i["name"] == "sessionid":
+                    self.session_id = i['value']
+                    logging.debug("Found SessionID")
+        except PermissionError as e:
+            logging.error(f"\t\t\t{e}")
+
+    def read_settings(self) -> None:
+        self.read_cookies()
+
         logging.info("Reading settings.inc")
         with open("settings.inc", "r") as f:
             logging.info("File opened successfully")
